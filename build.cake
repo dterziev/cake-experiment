@@ -7,6 +7,7 @@ var isLocalBuild = BuildSystem.IsLocalBuild;
 var solutionFile = File("./src/XPlat.sln").Path;
 var testProjects = GetFiles("./src/**/*Tests*.csproj");
 
+
 Task("Clean")
     .Does(() =>
     {
@@ -47,7 +48,7 @@ Task("Test")
 
             foreach(var framework in frameworks.Split(';')) 
             {
-                DotNetCoreTest(project.ToString(), new DotNetCoreTestSettings
+                DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
                 {
                     Framework = framework,
                     NoBuild = true,
@@ -63,12 +64,32 @@ Task("Publish")
     .IsDependentOn("Test")
     .Does(() => 
     {
-        // DotNetCorePublish( webApiProject.FullPath, new DotNetCorePublishSettings
-        // {
-        //     Configuration = configuration,
-        //     VersionSuffix = version.PreReleaseTag
-        // } );
+        DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
+        {
+            Framework = "netcoreapp2.1",
+            Runtime = "ubuntu.16.04-x64",
+            SelfContained = true,
+            Configuration = configuration,
+            VersionSuffix = "abcde"
+        });
 
+        DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
+        {
+            Framework = "netcoreapp2.1",
+            Runtime = "win7-x86",
+            SelfContained = true,
+            Configuration = configuration,
+            VersionSuffix = "abcde"
+        });
+
+        DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
+        {
+            Framework = "netcoreapp2.1",
+            Runtime = "win7-x64",
+            SelfContained = true,
+            Configuration = configuration,
+            VersionSuffix = "abcde"
+        });
     });
 
 Task("Default")
