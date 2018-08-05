@@ -6,7 +6,7 @@ var isLocalBuild = BuildSystem.IsLocalBuild;
     
 var solutionFile = File("./src/XPlat.sln").Path;
 var testProjects = GetFiles("./src/**/*Tests*.csproj");
-
+var versionSuffix = "alpha";
 
 Task("Clean")
     .Does(() =>
@@ -34,6 +34,7 @@ Task("Build")
         {
             Configuration = configuration,
             NoRestore = true,
+            VersionSuffix = versionSuffix
             //MSBuildSettings = msBuildSettings
         });
     });
@@ -60,35 +61,51 @@ Task("Test")
     });
 
 
-Task("Publish")    
+Task("Publish")
     .IsDependentOn("Test")
     .Does(() => 
     {
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
         {
-            Framework = "netcoreapp2.1",
-            Runtime = "ubuntu.16.04-x64",
+            Framework = "net462",
+            NoRestore = true,
             SelfContained = true,
             Configuration = configuration,
-            VersionSuffix = "abcde"
+            VersionSuffix = versionSuffix,
+            OutputDirectory = Directory("./output/net462")
+        });
+
+        DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
+        {
+            Framework = "netcoreapp2.1",
+            Runtime = "ubuntu.16.04-x64",
+            NoRestore = true,
+            SelfContained = true,
+            Configuration = configuration,
+            VersionSuffix = versionSuffix,
+            OutputDirectory = Directory("./output/ubuntu.16.04-x64")
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
         {
             Framework = "netcoreapp2.1",
             Runtime = "win7-x86",
+            NoRestore = true,
             SelfContained = true,
             Configuration = configuration,
-            VersionSuffix = "abcde"
+            VersionSuffix = versionSuffix,
+            OutputDirectory = Directory("./output/win7-x86")
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
         {
             Framework = "netcoreapp2.1",
             Runtime = "win7-x64",
+            NoRestore = true,
             SelfContained = true,
             Configuration = configuration,
-            VersionSuffix = "abcde"
+            VersionSuffix = versionSuffix,
+            OutputDirectory = Directory("./output/win7-x64")
         });
     });
 
@@ -97,6 +114,7 @@ Task("Default")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("Test")    
+    .IsDependentOn("Publish")
     .Does(() => 
     {
     });
