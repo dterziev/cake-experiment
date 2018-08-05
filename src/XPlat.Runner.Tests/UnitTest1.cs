@@ -19,7 +19,7 @@ namespace XPlat.Runner.Tests
 #if NETFRAMEWORK
             _output.WriteLine($"Framework: NETFRAMEWORK");
 #endif
-#if NETCOREAPP
+#if NETCORE
             _output.WriteLine($"Framework: NetCoreApp");
 #endif
             //Assert.True(false);
