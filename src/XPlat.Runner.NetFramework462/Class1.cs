@@ -8,5 +8,8 @@ namespace XPlat.Runner.NetFramework462
 {
     public class Class1
     {
+        public Class1() {
+            
+        }
     }
 }

@@ -1,72 +1,83 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
-
-//////////////////////////////////////////////////////////////////////
-// ARGUMENTS
-//////////////////////////////////////////////////////////////////////
+#tool "nuget:?package=GitVersion.CommandLine"
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-
-//////////////////////////////////////////////////////////////////////
-// PREPARATION
-//////////////////////////////////////////////////////////////////////
-
-// Define directories.
-var buildDir = Directory("./src/Example/bin") + Directory(configuration);
-
-//////////////////////////////////////////////////////////////////////
-// TASKS
-//////////////////////////////////////////////////////////////////////
+var isLocalBuild = BuildSystem.IsLocalBuild;
+    
+var solutionFile = File("./src/XPlat.sln").Path;
+var testProjects = GetFiles("./src/**/*Tests*.csproj");
 
 Task("Clean")
     .Does(() =>
-{
-    CleanDirectory(buildDir);
-});
+    {
+        CleanDirectories("./src/**/bin");
+	    CleanDirectories("./src/**/obj");
+    });
 
-Task("Restore-NuGet-Packages")
-    .IsDependentOn("Clean")
-    .Does(() =>
-{
-    NuGetRestore("./src/XPlat.sln");
-});
+Task("Restore")
+    .Does(() => 
+    {
+        DotNetCoreRestore(solutionFile.FullPath, new DotNetCoreRestoreSettings
+        {
+            Verbosity = DotNetCoreVerbosity.Minimal
+            //MSBuildSettings = msBuildSettings
+        });
+    });
 
 Task("Build")
-    .IsDependentOn("Restore-NuGet-Packages")
+	.IsDependentOn("Clean")
+	.IsDependentOn("Restore")
     .Does(() =>
-{
-    if(IsRunningOnWindows())
     {
-      // Use MSBuild
-      MSBuild("./src/Example.sln", settings =>
-        settings.SetConfiguration(configuration));
-    }
-    else
-    {
-      // Use XBuild
-      XBuild("./src/Example.sln", settings =>
-        settings.SetConfiguration(configuration));
-    }
-});
-
-Task("Run-Unit-Tests")
-    .IsDependentOn("Build")
-    .Does(() =>
-{
-    NUnit3("./src/**/bin/" + configuration + "/*.Tests.dll", new NUnit3Settings {
-        NoResults = true
+        DotNetCoreBuild(solutionFile.FullPath, new DotNetCoreBuildSettings()
+        {
+            Configuration = configuration,
+            NoRestore = true,
+            //MSBuildSettings = msBuildSettings
         });
-});
+    });
 
-//////////////////////////////////////////////////////////////////////
-// TASK TARGETS
-//////////////////////////////////////////////////////////////////////
+Task("Test")    
+    .IsDependentOn("Build")
+    .Does(() => 
+    {
+        foreach(var project in testProjects)
+        {
+            string frameworks = XmlPeek(project, "//TargetFrameworks");
+
+            foreach(var framework in frameworks.Split(';')) 
+            {
+                DotNetCoreTest(project.ToString(), new DotNetCoreTestSettings
+                {
+                    Framework = framework,
+                    NoBuild = true,
+                    NoRestore = true,
+                    Configuration = configuration
+                });
+            }
+        }
+    });
+
+
+Task("Publish")    
+    .IsDependentOn("Test")
+    .Does(() => 
+    {
+        // DotNetCorePublish( webApiProject.FullPath, new DotNetCorePublishSettings
+        // {
+        //     Configuration = configuration,
+        //     VersionSuffix = version.PreReleaseTag
+        // } );
+
+    });
 
 Task("Default")
-    .IsDependentOn("Run-Unit-Tests");
-
-//////////////////////////////////////////////////////////////////////
-// EXECUTION
-//////////////////////////////////////////////////////////////////////
+    .IsDependentOn("Clean")
+    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
+    .IsDependentOn("Test")    
+    .Does(() => 
+    {
+    });
 
 RunTarget(target);

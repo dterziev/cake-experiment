@@ -27,8 +27,8 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>
