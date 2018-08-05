@@ -3,7 +3,11 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var isLocalBuild = BuildSystem.IsLocalBuild;
-    
+var msBuildSettings = new DotNetCoreMSBuildSettings
+{
+    //MaxCpuCount = 1
+};
+
 var solutionFile = File("./src/XPlat.sln").Path;
 var testProjects = GetFiles("./src/**/*Tests*.csproj");
 var versionSuffix = "alpha";
@@ -20,8 +24,8 @@ Task("Restore")
     {
         DotNetCoreRestore(solutionFile.FullPath, new DotNetCoreRestoreSettings
         {
-            Verbosity = DotNetCoreVerbosity.Minimal
-            //MSBuildSettings = msBuildSettings
+            Verbosity = DotNetCoreVerbosity.Minimal,
+            MSBuildSettings = msBuildSettings
         });
     });
 
@@ -34,8 +38,10 @@ Task("Build")
         {
             Configuration = configuration,
             NoRestore = true,
-            VersionSuffix = versionSuffix
-            //MSBuildSettings = msBuildSettings
+            VersionSuffix = versionSuffix,
+            MSBuildSettings = msBuildSettings,
+            DiagnosticOutput = true,
+            Verbosity = DotNetCoreVerbosity.Minimal
         });
     });
 
@@ -72,7 +78,8 @@ Task("Publish")
             SelfContained = true,
             Configuration = configuration,
             VersionSuffix = versionSuffix,
-            OutputDirectory = Directory("./output/net462")
+            OutputDirectory = Directory("./output/net462"),
+            MSBuildSettings = msBuildSettings
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
@@ -83,7 +90,8 @@ Task("Publish")
             SelfContained = true,
             Configuration = configuration,
             VersionSuffix = versionSuffix,
-            OutputDirectory = Directory("./output/ubuntu.16.04-x64")
+            OutputDirectory = Directory("./output/ubuntu.16.04-x64"),
+            MSBuildSettings = msBuildSettings
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
@@ -94,7 +102,8 @@ Task("Publish")
             SelfContained = true,
             Configuration = configuration,
             VersionSuffix = versionSuffix,
-            OutputDirectory = Directory("./output/win7-x86")
+            OutputDirectory = Directory("./output/win7-x86"),
+            MSBuildSettings = msBuildSettings
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
@@ -105,7 +114,8 @@ Task("Publish")
             SelfContained = true,
             Configuration = configuration,
             VersionSuffix = versionSuffix,
-            OutputDirectory = Directory("./output/win7-x64")
+            OutputDirectory = Directory("./output/win7-x64"),
+            MSBuildSettings = msBuildSettings
         });
     });
 
