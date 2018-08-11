@@ -1,4 +1,7 @@
 #tool "nuget:?package=GitVersion.CommandLine"
+#tool "nuget:?package=TeamCity.VSTest.TestAdapter"
+#tool "nuget:?package=TeamCity.Dotnet.Integration"
+
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
@@ -15,6 +18,22 @@ var versionSuffix = "alpha";
 Task("Clean")
     .Does(() =>
     {
+        if (TeamCity.IsRunningOnTeamCity)
+        {
+            Information(
+                @"Environment:
+                PullRequest: {0}
+                Build Configuration Name: {1}
+                TeamCity Project Name: {2}",
+                BuildSystem.TeamCity.Environment.PullRequest.IsPullRequest,
+                BuildSystem.TeamCity.Environment.Build.BuildConfName,
+                BuildSystem.TeamCity.Environment.Project.Name
+                );
+        }
+        else
+        {
+            Information("Not running on TeamCity");
+        }
         CleanDirectories("./src/**/bin");
 	    CleanDirectories("./src/**/obj");
     });
@@ -34,14 +53,31 @@ Task("Build")
 	.IsDependentOn("Restore")
     .Does(() =>
     {
+        // https://github.com/JetBrains/TeamCity.MSBuild.Logger/wiki/How-to-use
+
+
+        var buildSettings = new DotNetCoreMSBuildSettings
+        {
+            MaxCpuCount = 8
+        };
+        
+        if(TeamCity.IsRunningOnTeamCity) 
+        {
+            buildSettings.DisableConsoleLogger();
+
+            var logger = File("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/msbuild15/TeamCity.MSBuild.Logger.dll").Path.FullPath;
+            buildSettings.WithLogger(logger, "TeamCity.MSBuild.Logger.TeamCityMSBuildLogger", "teamcity;PerformanceSummary;Summary");
+        }
+
         DotNetCoreBuild(solutionFile.FullPath, new DotNetCoreBuildSettings()
         {
             Configuration = configuration,
             NoRestore = true,
             VersionSuffix = versionSuffix,
-            MSBuildSettings = msBuildSettings,
+            MSBuildSettings = buildSettings,
             DiagnosticOutput = true,
-            Verbosity = DotNetCoreVerbosity.Minimal
+            Verbosity = DotNetCoreVerbosity.Normal,
+            
         });
     });
 
@@ -49,6 +85,8 @@ Task("Test")
     .IsDependentOn("Build")
     .Does(() => 
     {
+        // https://github.com/JetBrains/TeamCity.VSTest.TestAdapter
+
         foreach(var project in testProjects)
         {
             string frameworks = XmlPeek(project, "//TargetFrameworks");
@@ -60,7 +98,9 @@ Task("Test")
                     Framework = framework,
                     NoBuild = true,
                     NoRestore = true,
-                    Configuration = configuration
+                    Configuration = configuration,
+                    //TestAdapterPath = Directory("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/vstest15"),
+                    //Logger = ""
                 });
             }
         }
