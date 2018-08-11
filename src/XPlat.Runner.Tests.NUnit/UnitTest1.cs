@@ -11,6 +11,7 @@ namespace XPlat.Runner.Tests.NUnit
         {
 #if NETFRAMEWORK
             Console.WriteLine($"Framework: NETFRAMEWORK");
+            Assert.False(true, "Fail under full framework.");
 #endif
 #if NETCORE
             Console.WriteLine($"Framework: NetCoreApp");

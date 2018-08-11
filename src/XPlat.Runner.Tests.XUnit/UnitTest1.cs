@@ -18,6 +18,7 @@ namespace XPlat.Runner.Tests
             _output.WriteLine($"Environment.Version: {Environment.Version}");
 #if NETFRAMEWORK
             _output.WriteLine($"Framework: NETFRAMEWORK");
+            Assert.False(true, "Fail under full framework.");
 #endif
 #if NETCORE
             _output.WriteLine($"Framework: NetCoreApp");

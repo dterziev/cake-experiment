@@ -76,7 +76,7 @@ Task("Build")
             VersionSuffix = versionSuffix,
             MSBuildSettings = buildSettings,
             DiagnosticOutput = true,
-            Verbosity = DotNetCoreVerbosity.Normal,
+            Verbosity = DotNetCoreVerbosity.Minimal,
             
         });
     });
@@ -86,6 +86,7 @@ Task("Test")
     .Does(() => 
     {
         // https://github.com/JetBrains/TeamCity.VSTest.TestAdapter
+        List<Task> tasks = new List<Task>();
 
         foreach(var project in testProjects)
         {
@@ -93,17 +94,21 @@ Task("Test")
 
             foreach(var framework in frameworks.Split(';')) 
             {
-                DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
-                {
-                    Framework = framework,
-                    NoBuild = true,
-                    NoRestore = true,
-                    Configuration = configuration,
-                    //TestAdapterPath = Directory("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/vstest15"),
-                    //Logger = ""
-                });
+                tasks.Add(System.Threading.Tasks.Task.Run(() => 
+                    DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
+                    {
+                        Framework = framework,
+                        NoBuild = true,
+                        NoRestore = true,
+                        Configuration = configuration,
+                        //TestAdapterPath = Directory("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/vstest15"),
+                        //Logger = ""
+                    })
+                ));
             }
         }
+
+        System.Threading.Tasks.Task.WaitAll(tasks.ToArray());
     });
 
 Task("Publish-WebApp")
