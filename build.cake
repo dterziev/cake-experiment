@@ -66,12 +66,25 @@ Task("Test")
         }
     });
 
+Task("Publish-WebApp")
+	.IsDependentOn("Build")
+	.Does(() => {
+		DotNetCorePublish(File("./src/XPlat.Web.MVCNet461/XPlat.Web.MVCNet461.csproj").Path.FullPath, new DotNetCorePublishSettings
+        {
+            Framework = "net461",
+            NoRestore = true,
+            SelfContained = true,
+            Configuration = configuration,
+            VersionSuffix = versionSuffix,
+            OutputDirectory = Directory("./output/web/net461"),
+            MSBuildSettings = msBuildSettings
+        });
+	});
 
-Task("Publish")
-    .IsDependentOn("Test")
-    .Does(() => 
-    {
-        DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
+Task("Publish-Apps")
+	.IsDependentOn("Build")
+	.Does(() => {
+		DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
         {
             Framework = "net462",
             NoRestore = true,
@@ -117,6 +130,13 @@ Task("Publish")
             OutputDirectory = Directory("./output/win7-x64"),
             MSBuildSettings = msBuildSettings
         });
+	});
+
+Task("Publish")
+    .IsDependentOn("Publish-WebApp")
+    .IsDependentOn("Publish-Apps")
+    .Does(() => 
+    {
     });
 
 Task("Default")

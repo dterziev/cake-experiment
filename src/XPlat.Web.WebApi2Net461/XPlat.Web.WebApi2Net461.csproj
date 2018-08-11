@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net461</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Cors" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Tracing" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Versioning" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Versioning.ApiExplorer" Version="1.2.1" />
+    <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.StaticFiles" Version="4.0.0" />
+    <PackageReference Include="NLog" Version="4.5.8" />
+    <PackageReference Include="Swashbuckle.Core" Version="5.6.0" />
+    <PackageReference Include="Topshelf" Version="4.0.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net461'">
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

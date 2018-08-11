@@ -9,7 +9,12 @@ namespace XPlat.Runner.Tests.NUnit
         [Test]
         public void Test1()
         {
-            Console.WriteLine("MyTest");
+#if NETFRAMEWORK
+            Console.WriteLine($"Framework: NETFRAMEWORK");
+#endif
+#if NETCORE
+            Console.WriteLine($"Framework: NetCoreApp");
+#endif
         }
     }
 }

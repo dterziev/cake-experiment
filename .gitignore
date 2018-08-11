@@ -10,6 +10,7 @@
 # Build related
 tools/**
 !tools/packages.config
+output/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
