@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27924.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPlat.Runner", "XPlat.Runner\XPlat.Runner.csproj", "{EDFC7C60-C050-4A49-BD12-89F6799DFFE0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPlat.Runner.Tests", "XPlat.Runner.Tests\XPlat.Runner.Tests.csproj", "{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPlat.Runner.Tests.NUnit", "XPlat.Runner.Tests.NUnit\XPlat.Runner.Tests.NUnit.csproj", "{B14B232B-60A3-4448-8FFC-607638AC0C91}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4F7A24D-220E-4F75-BEF0-493D6B3E5B3E}"
@@ -19,6 +17,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPlat.Web.MVCNet461", "XPlat.Web.MVCNet461\XPlat.Web.MVCNet461.csproj", "{505C503F-F734-491C-8309-6D47A7371083}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPlat.Web.WebApi2Net461", "XPlat.Web.WebApi2Net461\XPlat.Web.WebApi2Net461.csproj", "{81174AED-941C-4A27-B207-99C93091B409}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPlat.Runner.Tests.XUnit", "XPlat.Runner.Tests.XUnit\XPlat.Runner.Tests.XUnit.csproj", "{01C46BEF-A235-420E-8270-FB2C40DCCCF9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,18 +42,6 @@ Global
 		{EDFC7C60-C050-4A49-BD12-89F6799DFFE0}.Release|x64.Build.0 = Release|Any CPU
 		{EDFC7C60-C050-4A49-BD12-89F6799DFFE0}.Release|x86.ActiveCfg = Release|Any CPU
 		{EDFC7C60-C050-4A49-BD12-89F6799DFFE0}.Release|x86.Build.0 = Release|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Debug|x64.Build.0 = Debug|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Debug|x86.Build.0 = Debug|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Release|x64.ActiveCfg = Release|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Release|x64.Build.0 = Release|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Release|x86.ActiveCfg = Release|Any CPU
-		{4D4EF629-C02C-41AD-849D-C5FC399D1FA0}.Release|x86.Build.0 = Release|Any CPU
 		{B14B232B-60A3-4448-8FFC-607638AC0C91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B14B232B-60A3-4448-8FFC-607638AC0C91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B14B232B-60A3-4448-8FFC-607638AC0C91}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -102,6 +90,18 @@ Global
 		{81174AED-941C-4A27-B207-99C93091B409}.Release|x64.Build.0 = Release|Any CPU
 		{81174AED-941C-4A27-B207-99C93091B409}.Release|x86.ActiveCfg = Release|Any CPU
 		{81174AED-941C-4A27-B207-99C93091B409}.Release|x86.Build.0 = Release|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Debug|x64.Build.0 = Debug|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Debug|x86.Build.0 = Debug|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Release|x64.ActiveCfg = Release|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Release|x64.Build.0 = Release|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Release|x86.ActiveCfg = Release|Any CPU
+		{01C46BEF-A235-420E-8270-FB2C40DCCCF9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
