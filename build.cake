@@ -34,6 +34,8 @@ Task("Clean")
         {
             Information("Not running on TeamCity");
         }
+        
+        CleanDirectories("./output");
         CleanDirectories("./src/**/bin");
 	    CleanDirectories("./src/**/obj");
     });
@@ -86,29 +88,42 @@ Task("Test")
     .Does(() => 
     {
         // https://github.com/JetBrains/TeamCity.VSTest.TestAdapter
-        List<Task> tasks = new List<Task>();
-
+        
+        bool hasError = false;
         foreach(var project in testProjects)
         {
             string frameworks = XmlPeek(project, "//TargetFrameworks");
-
+            
             foreach(var framework in frameworks.Split(';')) 
             {
-                tasks.Add(System.Threading.Tasks.Task.Run(() => 
-                    DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
-                    {
-                        Framework = framework,
-                        NoBuild = true,
-                        NoRestore = true,
-                        Configuration = configuration,
-                        //TestAdapterPath = Directory("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/vstest15"),
-                        //Logger = ""
-                    })
-                ));
+                try{
+                DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
+                {
+                    Framework = framework,
+                    NoBuild = true,
+                    NoRestore = true,
+                    Configuration = configuration,
+                    ResultsDirectory = Directory("./output/testresults"),
+                    Logger = "trx"
+                    //TestAdapterPath = Directory("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/vstest15"),
+                    //Logger = ""
+                });
+                }
+                catch(Exception ex) {
+                    Error(ex);
+                    hasError = true;
+                }
             }
         }
 
-        System.Threading.Tasks.Task.WaitAll(tasks.ToArray());
+        foreach(var f in GetFiles("./output/testresults/*.trx")) 
+        {
+            TeamCity.ImportData("vstest", f);
+        }
+
+        if(hasError) {
+            throw new CakeException("Tests have failed.");
+        }
     });
 
 Task("Publish-WebApp")
@@ -182,6 +197,7 @@ Task("Publish")
     .IsDependentOn("Publish-Apps")
     .Does(() => 
     {
+        TeamCity.PublishArtifacts("./output")
     });
 
 Task("Default")
