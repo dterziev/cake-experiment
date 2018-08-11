@@ -197,7 +197,7 @@ Task("Publish")
     .IsDependentOn("Publish-Apps")
     .Does(() => 
     {
-        TeamCity.PublishArtifacts("./output")
+        TeamCity.PublishArtifacts("./output");
     });
 
 Task("Default")
