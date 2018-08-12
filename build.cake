@@ -196,13 +196,15 @@ Task("DotNetTest-WithCoverage")
             GetFiles("./output/*.dcvr"), 
             File("./output/merged.dcvr"));
         
-        Information("Compiling report");
-        DotCoverReport(
-            File("./output/merged.dcvr"),
-            File("./output/report.html"),
-            new DotCoverReportSettings {
-                ReportType = DotCoverReportType.HTML
-            });
+        // Information("Compiling report");
+        // DotCoverReport(
+        //     File("./output/merged.dcvr"),
+        //     File("./output/report.html"),
+        //     new DotCoverReportSettings {
+        //         ReportType = DotCoverReportType.HTML
+        //     });
+        
+        TeamCity.ImportDotCoverCoverage(File("./output/merged.dcvr"));
         
         foreach(var f in GetFiles("./output/testresults/*.trx")) 
         {
