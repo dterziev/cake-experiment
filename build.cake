@@ -119,7 +119,7 @@ Task("DotNetTest-All")
                     NoRestore = true,
                     Configuration = configuration,
                     ResultsDirectory = Directory("./output/testresults"),
-                    Logger = "trx",
+                    Logger = $"trx;LogFileName={project.GetFilenameWithoutExtension()}.{framework}.trx",
                     //Settings = File("testsettings.xml"),
                     //ArgumentCustomization = args=>args.Append("/parallel") 
                     //TestAdapterPath = Directory("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/vstest15"),
