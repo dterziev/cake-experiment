@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net462;netcoreapp2.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <RootNamespace>XPlat.Runner.Tests.XUnit</RootNamespace>
+    <AssemblyName>$(RootNamespace).$(TargetFramework)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

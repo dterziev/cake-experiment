@@ -1,8 +1,8 @@
 using System;
 using Xunit;
 
-namespace XPlat.Runner.Tests
-{
+namespace XPlat.Runner.Tests.XUnit
+{ 
     public class UnitTest1
     {
         private readonly Xunit.Abstractions.ITestOutputHelper _output;
