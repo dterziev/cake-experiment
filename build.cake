@@ -2,18 +2,32 @@
 #tool "nuget:?package=TeamCity.VSTest.TestAdapter"
 #tool "nuget:?package=TeamCity.Dotnet.Integration"
 
+//////////////////////////////////////////////////////////////////////
+// ARGUMENTS
+//////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+
+//////////////////////////////////////////////////////////////////////
+// SET PACKAGE VERSION
+//////////////////////////////////////////////////////////////////////
+var versionSuffix = "alpha";
+
+//////////////////////////////////////////////////////////////////////
+// DEFINE RUN CONSTANTS
+//////////////////////////////////////////////////////////////////////
+
+var solutionFile = File("./src/XPlat.sln").Path;
+var testProjects = GetFiles("./src/**/*Tests*.csproj");
 var isLocalBuild = BuildSystem.IsLocalBuild;
-var msBuildSettings = new DotNetCoreMSBuildSettings
 {
     //MaxCpuCount = 1
 };
 
-var solutionFile = File("./src/XPlat.sln").Path;
-var testProjects = GetFiles("./src/**/*Tests*.csproj");
-var versionSuffix = "alpha";
+//////////////////////////////////////////////////////////////////////
+// Clean
+//////////////////////////////////////////////////////////////////////
 
 Task("Clean")
     .Does(() =>
@@ -40,21 +54,18 @@ Task("Clean")
 	    CleanDirectories("./src/**/obj");
     });
 
-Task("Restore")
-    .Does(() => 
+//////////////////////////////////////////////////////////////////////
+// Build
+//////////////////////////////////////////////////////////////////////
+
+Task("Build")
+    .Does(() =>
     {
         DotNetCoreRestore(solutionFile.FullPath, new DotNetCoreRestoreSettings
         {
-            Verbosity = DotNetCoreVerbosity.Minimal,
-            MSBuildSettings = msBuildSettings
+            Verbosity = DotNetCoreVerbosity.Minimal
         });
-    });
 
-Task("Build")
-	.IsDependentOn("Clean")
-	.IsDependentOn("Restore")
-    .Does(() =>
-    {
         // https://github.com/JetBrains/TeamCity.MSBuild.Logger/wiki/How-to-use
 
 
@@ -68,7 +79,7 @@ Task("Build")
             buildSettings.DisableConsoleLogger();
 
             var logger = File("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/msbuild15/TeamCity.MSBuild.Logger.dll").Path.FullPath;
-            buildSettings.WithLogger(logger, "TeamCity.MSBuild.Logger.TeamCityMSBuildLogger", "teamcity;PerformanceSummary;Summary");
+            buildSettings.WithLogger(logger, "TeamCity.MSBuild.Logger.TeamCityMSBuildLogger", "teamcity;Summary");
         }
 
         DotNetCoreBuild(solutionFile.FullPath, new DotNetCoreBuildSettings()
@@ -83,7 +94,11 @@ Task("Build")
         });
     });
 
-Task("Test")    
+//////////////////////////////////////////////////////////////////////
+// TEST
+//////////////////////////////////////////////////////////////////////
+
+Task("DotNetTest-All")    
     .IsDependentOn("Build")
     .Does(() => 
     {
@@ -129,6 +144,10 @@ Task("Test")
         }
     });
 
+//////////////////////////////////////////////////////////////////////
+// Publish
+//////////////////////////////////////////////////////////////////////
+
 Task("Publish-WebApp")
 	.IsDependentOn("Build")
 	.Does(() => {
@@ -140,7 +159,6 @@ Task("Publish-WebApp")
             Configuration = configuration,
             VersionSuffix = versionSuffix,
             OutputDirectory = Directory("./output/web/net461"),
-            MSBuildSettings = msBuildSettings
         });
 	});
 
@@ -155,7 +173,6 @@ Task("Publish-Apps")
             Configuration = configuration,
             VersionSuffix = versionSuffix,
             OutputDirectory = Directory("./output/net462"),
-            MSBuildSettings = msBuildSettings
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
@@ -167,7 +184,6 @@ Task("Publish-Apps")
             Configuration = configuration,
             VersionSuffix = versionSuffix,
             OutputDirectory = Directory("./output/ubuntu.16.04-x64"),
-            MSBuildSettings = msBuildSettings
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
@@ -179,7 +195,6 @@ Task("Publish-Apps")
             Configuration = configuration,
             VersionSuffix = versionSuffix,
             OutputDirectory = Directory("./output/win7-x86"),
-            MSBuildSettings = msBuildSettings
         });
 
         DotNetCorePublish(File("./src/XPlat.Runner/XPlat.Runner.csproj").Path.FullPath, new DotNetCorePublishSettings
@@ -191,9 +206,20 @@ Task("Publish-Apps")
             Configuration = configuration,
             VersionSuffix = versionSuffix,
             OutputDirectory = Directory("./output/win7-x64"),
-            MSBuildSettings = msBuildSettings
         });
 	});
+
+
+//////////////////////////////////////////////////////////////////////
+// TASK TARGETS
+//////////////////////////////////////////////////////////////////////
+
+Task("Rebuild")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Build");
+
+Task("Test")
+    .IsDependentOn("DotNetTest-All");
 
 Task("Publish")
     .IsDependentOn("Publish-WebApp")
@@ -202,15 +228,10 @@ Task("Publish")
     {
         TeamCity.PublishArtifacts("./output");
     });
-
+    
 Task("Default")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Restore")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test")    
-    .IsDependentOn("Publish")
-    .Does(() => 
-    {
-    });
+    .IsDependentOn("Rebuild")
+    .IsDependentOn("Test")
+    .IsDependentOn("Publish");
 
 RunTarget(target);
