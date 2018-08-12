@@ -21,10 +21,8 @@ var versionSuffix = "alpha";
 
 var solutionFile = File("./src/XPlat.sln").Path;
 var testProjects = GetFiles("./src/**/*Tests*.csproj");
-var isLocalBuild = BuildSystem.IsLocalBuild;
-{
-    //MaxCpuCount = 1
-};
+var outputDir = Directory("./output");
+var testResultsDir = Directory("./output/testresults");
 
 //////////////////////////////////////////////////////////////////////
 // Clean
@@ -50,7 +48,7 @@ Task("Clean")
             Information("Not running on TeamCity");
         }
         
-        CleanDirectories("./output");
+        CleanDirectories(outputDir);
         CleanDirectories("./src/**/bin");
 	    CleanDirectories("./src/**/obj");
     });
@@ -91,7 +89,6 @@ Task("Build")
             MSBuildSettings = buildSettings,
             DiagnosticOutput = true,
             Verbosity = DotNetCoreVerbosity.Minimal,
-            
         });
     });
 
@@ -104,7 +101,6 @@ Task("DotNetTest-All")
     .Does(() => 
     {
         // https://github.com/JetBrains/TeamCity.VSTest.TestAdapter
-        
         bool hasError = false;
         foreach(var project in testProjects)
         {
@@ -119,7 +115,7 @@ Task("DotNetTest-All")
                     NoBuild = true,
                     NoRestore = true,
                     Configuration = configuration,
-                    ResultsDirectory = Directory("./output/testresults"),
+                    ResultsDirectory = testResultsDir,
                     Logger = $"trx;LogFileName={project.GetFilenameWithoutExtension()}.{framework}.trx",
                     //Settings = File("testsettings.xml"),
                     //ArgumentCustomization = args=>args.Append("/parallel") 
@@ -139,7 +135,7 @@ Task("DotNetTest-All")
         }
     })
     .Finally(() => {
-        foreach(var f in GetFiles("./output/testresults/*.trx")) 
+        foreach(var f in GetFiles($"{testResultsDir}/*.trx")) 
         {
             TeamCity.ImportData("vstest", f);
         }
@@ -164,7 +160,7 @@ Task("DotNetTest-WithCoverage")
                             NoBuild = true,
                             NoRestore = true,
                             Configuration = configuration,
-                            ResultsDirectory = Directory("./output/testresults"),
+                            ResultsDirectory = testResultsDir,
                             Logger = $"trx;LogFileName={project.GetFilenameWithoutExtension()}.{framework}.trx",
                             //Settings = File("testsettings.xml"),
                             //ArgumentCustomization = args=>args.Append("/parallel") 
@@ -172,7 +168,7 @@ Task("DotNetTest-WithCoverage")
                             //Logger = ""
                         });
                         },
-                        new FilePath($"./output/{project.GetFilenameWithoutExtension()}.{framework}.dcvr"),
+                        File($"{testResultsDir}/{project.GetFilenameWithoutExtension()}.{framework}.dcvr"),
                         new DotCoverCoverSettings()
                             .WithFilter("+:XPlat*")
                             .WithFilter("-:*Test*")
@@ -192,21 +188,14 @@ Task("DotNetTest-WithCoverage")
     .Finally(() => {
         Information("Merging dotCover output");
 
+        var mergedCoverage = File($"{testResultsDir}/merged.dcvr");
         DotCoverMerge(
-            GetFiles("./output/*.dcvr"), 
-            File("./output/merged.dcvr"));
-            
-        // Information("Compiling report");
-        // DotCoverReport(
-        //     File("./output/merged.dcvr"),
-        //     File("./output/report.html"),
-        //     new DotCoverReportSettings {
-        //         ReportType = DotCoverReportType.HTML
-        //     });
+            GetFiles($"{testResultsDir}/*.dcvr"), 
+            mergedCoverage);
         
-        TeamCity.ImportDotCoverCoverage(File("./output/merged.dcvr"));
+        TeamCity.ImportDotCoverCoverage(mergedCoverage);
         
-        foreach(var f in GetFiles("./output/testresults/*.trx")) 
+        foreach(var f in GetFiles($"{testResultsDir}/*.trx")) 
         {
             TeamCity.ImportData("vstest", f);
         }
