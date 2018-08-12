@@ -195,7 +195,7 @@ Task("DotNetTest-WithCoverage")
         DotCoverMerge(
             GetFiles("./output/*.dcvr"), 
             File("./output/merged.dcvr"));
-        
+            
         // Information("Compiling report");
         // DotCoverReport(
         //     File("./output/merged.dcvr"),

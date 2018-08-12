@@ -15,16 +15,15 @@ namespace XPlat.Runner.Tests.XUnit
         [Fact]
         public void Test1()
         {
-            _output.WriteLine($"Environment.Version: {Environment.Version}");
+            Console.WriteLine(new Class1().SayHello());
+
 #if NETFRAMEWORK
             _output.WriteLine($"Framework: NETFRAMEWORK");
-            Assert.False(true, "Fail under full framework.");
+            //Assert.False(true, "Fail under full framework.");
 #endif
 #if NETCORE
             _output.WriteLine($"Framework: NetCoreApp");
 #endif
-            //Assert.True(false);
-            _output.WriteLine(new Class1().SayHello());
         }
     }
 }
