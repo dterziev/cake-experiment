@@ -1,6 +1,7 @@
 #tool "nuget:?package=GitVersion.CommandLine"
 #tool "nuget:?package=TeamCity.VSTest.TestAdapter"
 #tool "nuget:?package=TeamCity.Dotnet.Integration"
+#tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -144,6 +145,71 @@ Task("DotNetTest-All")
         }
     });
 
+Task("DotNetTest-WithCoverage")    
+    .IsDependentOn("Build")
+    .Does(() => 
+    {
+        bool hasError = false;
+        foreach(var project in testProjects)
+        {
+            string frameworks = XmlPeek(project, "//TargetFrameworks");
+            
+            foreach(var framework in frameworks.Split(';')) 
+            {
+                try{
+                    DotCoverCover(tool => {
+                        tool.DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
+                        {
+                            Framework = framework,
+                            NoBuild = true,
+                            NoRestore = true,
+                            Configuration = configuration,
+                            ResultsDirectory = Directory("./output/testresults"),
+                            Logger = $"trx;LogFileName={project.GetFilenameWithoutExtension()}.{framework}.trx",
+                            //Settings = File("testsettings.xml"),
+                            //ArgumentCustomization = args=>args.Append("/parallel") 
+                            //TestAdapterPath = Directory("./tools/TeamCity.Dotnet.Integration.1.0.2/build/_common/vstest15"),
+                            //Logger = ""
+                        });
+                        },
+                        new FilePath($"./output/{project.GetFilenameWithoutExtension()}.{framework}.dcvr"),
+                        new DotCoverCoverSettings()
+                            .WithFilter("+:XPlat*")
+                            .WithFilter("-:*Test*")
+                    );
+                }
+                catch(Exception ex) {
+                    Error(ex);
+                    hasError = true;
+                }
+            }
+        }
+
+        if(hasError) {
+            throw new CakeException("Tests have failed.");
+        }
+    })
+    .Finally(() => {
+        Information("Merging dotCover output");
+
+        DotCoverMerge(
+            GetFiles("./output/*.dcvr"), 
+            File("./output/merged.dcvr"));
+        
+        Information("Compiling report");
+        DotCoverReport(
+            File("./output/merged.dcvr"),
+            File("./output/report.html"),
+            new DotCoverReportSettings {
+                ReportType = DotCoverReportType.HTML
+            });
+        
+        foreach(var f in GetFiles("./output/testresults/*.trx")) 
+        {
+            TeamCity.ImportData("vstest", f);
+        }
+    });
+
 //////////////////////////////////////////////////////////////////////
 // Publish
 //////////////////////////////////////////////////////////////////////
@@ -219,7 +285,7 @@ Task("Rebuild")
     .IsDependentOn("Build");
 
 Task("Test")
-    .IsDependentOn("DotNetTest-All");
+    .IsDependentOn("DotNetTest-WithCoverage");
 
 Task("Publish")
     .IsDependentOn("Publish-WebApp")
