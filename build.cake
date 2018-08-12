@@ -118,13 +118,14 @@ Task("Test")
             }
         }
 
+        if(hasError) {
+            throw new CakeException("Tests have failed.");
+        }
+    })
+    .Finally(() => {
         foreach(var f in GetFiles("./output/testresults/*.trx")) 
         {
             TeamCity.ImportData("vstest", f);
-        }
-
-        if(hasError) {
-            throw new CakeException("Tests have failed.");
         }
     });
 
