@@ -1,7 +1,9 @@
-#tool "nuget:?package=GitVersion.CommandLine"
-#tool "nuget:?package=TeamCity.VSTest.TestAdapter"
-#tool "nuget:?package=TeamCity.Dotnet.Integration"
-#tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
+#tool "nuget:?package=GitVersion.CommandLine&version=3.6.5"
+#tool "nuget:?package=TeamCity.Dotnet.Integration&version=1.0.2"
+#tool "nuget:?package=JetBrains.dotCover.CommandLineTools&version=2018.1.4"
+#addin "nuget:?package=Newtonsoft.Json"
+
+using Newtonsoft.Json;
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -13,6 +15,7 @@ var configuration = Argument("configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 // SET PACKAGE VERSION
 //////////////////////////////////////////////////////////////////////
+GitVersion version = null;
 var versionSuffix = "alpha";
 
 //////////////////////////////////////////////////////////////////////
@@ -56,8 +59,28 @@ Task("Clean")
 //////////////////////////////////////////////////////////////////////
 // Build
 //////////////////////////////////////////////////////////////////////
+Task("UpdateAssemblyInfo")
+    .Does(() => {
+
+        if (BuildSystem.IsLocalBuild) 
+        {
+            GitVersion(new GitVersionSettings {
+                UpdateAssemblyInfoFilePath = File("./src/SolutionAssemblyInfo.cs"),
+                UpdateAssemblyInfo = true,
+                OutputType = GitVersionOutput.BuildServer
+            });
+        }
+
+        version = GitVersion(new GitVersionSettings{ OutputType = GitVersionOutput.Json });
+        Information("Version: " + version.NuGetVersion);
+
+        System.IO.File.WriteAllText(
+            "./output/version.json", 
+            JsonConvert.SerializeObject(version, Formatting.Indented));
+    });
 
 Task("Build")
+    .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
         DotNetCoreRestore(solutionFile.FullPath, new DotNetCoreRestoreSettings
