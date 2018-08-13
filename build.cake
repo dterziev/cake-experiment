@@ -62,7 +62,7 @@ Task("Clean")
 Task("UpdateAssemblyInfo")
     .Does(() => {
 
-        if (BuildSystem.IsLocalBuild) 
+        if (!BuildSystem.IsLocalBuild) 
         {
             GitVersion(new GitVersionSettings {
                 UpdateAssemblyInfoFilePath = File("./src/SolutionAssemblyInfo.cs"),
