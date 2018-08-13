@@ -12,6 +12,7 @@
     <GenerateAssemblyBindingRedirects>true</GenerateAssemblyBindingRedirects>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <!-- Warnings as errors -->
