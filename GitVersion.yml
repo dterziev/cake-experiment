@@ -1,4 +1,14 @@
 #next-version: 1.0.5
-branches: {}
+branches:
+  master:
+    regex: master
+    mode: ContinuousDelivery
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    tracks-release-branches: false
+    is-release-branch: false
+    
 ignore:
   sha: []
