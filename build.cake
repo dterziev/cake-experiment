@@ -74,8 +74,9 @@ Task("UpdateAssemblyInfo")
         version = GitVersion(new GitVersionSettings{ OutputType = GitVersionOutput.Json });
         Information("Version: " + version.NuGetVersion);
 
+        CreateDirectory(outputDir);
         System.IO.File.WriteAllText(
-            "./output/version.json", 
+            $"{outputDir}/version.json", 
             JsonConvert.SerializeObject(version, Formatting.Indented));
     });
 
