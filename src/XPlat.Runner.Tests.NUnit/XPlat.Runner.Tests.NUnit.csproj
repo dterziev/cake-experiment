@@ -6,7 +6,7 @@
     <IsPackable>false</IsPackable>
 
     <RootNamespace>XPlat.Runner.Tests.NUnit</RootNamespace>
-    <AssemblyName>$(RootNamespace).$(TargetFramework)</AssemblyName>
+    <!--<AssemblyName>$(RootNamespace).$(TargetFramework)</AssemblyName>-->
   </PropertyGroup>
 
   <ItemGroup>
