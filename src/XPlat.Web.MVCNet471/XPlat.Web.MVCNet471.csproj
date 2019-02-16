@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp2.1</TargetFrameworks>
     <DebugType>full</DebugType>
     <!--<RuntimeFrameworkVersion>2.1.0</RuntimeFrameworkVersion>-->
   </PropertyGroup>
@@ -18,8 +18,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.HttpSys" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.0" />
     <PackageReference Include="NLog" Version="4.5.8" />
-    <PackageReference Include="Topshelf" Version="4.0.4" Condition="$(TargetFramework) == 'net461'"/>
-    <PackageReference Include="Topshelf.NLog" Version="4.0.4" Condition="$(TargetFramework) == 'net461'"/>
+    <PackageReference Include="Topshelf" Version="4.0.4" Condition="$(TargetFramework) == 'net471'"/>
+    <PackageReference Include="Topshelf.NLog" Version="4.0.4" Condition="$(TargetFramework) == 'net471'"/>
   </ItemGroup>
     
 </Project>

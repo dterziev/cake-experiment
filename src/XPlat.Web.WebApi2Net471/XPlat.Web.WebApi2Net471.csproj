@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net471</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,7 +24,7 @@
     <PackageReference Include="Topshelf" Version="4.0.4" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework) == 'net461'">
+  <ItemGroup Condition="$(TargetFramework) == 'net471'">
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Web" />
     <Reference Include="System.ServiceProcess" />
